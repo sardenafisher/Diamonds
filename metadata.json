@@ -1,0 +1,6 @@
+{
+  "name": "DIAMONDS — Unified Business Management Platform",
+  "description": "The unified digital operating system uniting CRM, customer communications, websites, distribution, automated workflows, and business intelligence in one connected workspace.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
