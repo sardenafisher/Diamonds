@@ -1,7 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CreditCard, Plus, Calendar, AlertCircle, X, Check } from 'lucide-react';
+import {
+  CreditCard,
+  Plus,
+  Calendar,
+  AlertCircle,
+  X,
+  Check,
+  TrendingDown,
+  Layers,
+  ArrowRight,
+  ShieldCheck,
+  Zap
+} from 'lucide-react';
 import { SoftwareSubscription } from '@/lib/workspace-data';
 
 interface SubscriptionsViewProps {
@@ -38,56 +50,81 @@ export function SubscriptionsView({ subscriptions, onAddSubscription }: Subscrip
 
   return (
     <div className="space-y-6">
+      {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
-            Subscriptions & Operational Expenses
-          </h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Audit recurring SaaS tools, hosting containers, and software licenses in one ledger.
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              Subscriptions & Operational Cost Consolidation
+            </h1>
+            <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              $2,450/mo Saved
+            </span>
+          </div>
+          <p className="text-xs text-slate-400 mt-1">
+            Audit recurring SaaS tools, hosting infrastructure, and consolidate fragmented vendor sprawl into DIAMONDS.
           </p>
         </div>
 
         <button
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#38BDF8] text-slate-950 font-bold text-xs uppercase tracking-wider hover:bg-[#7dd3fc] transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#2489DA] text-white font-bold text-xs hover:bg-[#38BDF8] hover:text-slate-950 transition-colors shadow-[0_0_15px_rgba(36,137,218,0.3)]"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           <span>Track New Expense</span>
         </button>
       </div>
 
-      {/* Burn Rate Highlight */}
-      <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
-            Total Operational Software Overhead
-          </span>
-          <div className="text-3xl font-extrabold font-mono text-white mt-1">
-            ${totalMonthlyBurn.toLocaleString()} <span className="text-xs font-normal text-slate-400 font-sans">/ month</span>
+      {/* Burn Rate & Consolidation Highlight (Genie ERP Box Style) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="box p-5 flex flex-col justify-between space-y-3">
+          <div>
+            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+              Total Operational Software Overhead
+            </span>
+            <div className="text-3xl font-black font-mono text-white mt-1">
+              ${totalMonthlyBurn.toLocaleString()}{' '}
+              <span className="text-xs font-normal text-slate-400 font-sans">/ month</span>
+            </div>
+          </div>
+          <div className="text-xs text-slate-400 flex items-center justify-between pt-2 border-t border-white/5">
+            <span>Audited across {subscriptions.length} active technology vendors</span>
+            <span className="text-[#38BDF8] font-mono font-semibold">100% Reconciled</span>
           </div>
         </div>
-        <div className="text-xs text-slate-400">
-          Audited across {subscriptions.length} active technology vendors
+
+        <div className="box-highlight p-5 flex flex-col justify-between space-y-3">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
+              <TrendingDown className="w-4 h-4 text-emerald-400" />
+              <span>DIAMONDS ERP Consolidation Savings</span>
+            </div>
+            <div className="text-3xl font-black font-mono text-emerald-400 mt-1">
+              $2,450 <span className="text-xs font-normal text-slate-300 font-sans">/ month net reduction</span>
+            </div>
+          </div>
+          <div className="text-xs text-slate-300 leading-normal">
+            Replaced HubSpot, Zendesk, WP Engine, Zapier, and Bokun with one unified multi-tenant engine.
+          </div>
         </div>
       </div>
 
-      {/* Subscriptions Table */}
-      <div className="rounded-xl border border-white/10 bg-[#080D17] overflow-hidden">
+      {/* Subscriptions Table (Genie ERP High-Density Datatable) */}
+      <div className="rounded-xl border border-[#1E2E4A] bg-[#0A1324] overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#0B101B] border-b border-white/10 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <thead className="bg-[#0E1B33] border-b border-[#1E2E4A] text-[10px] font-bold uppercase tracking-wider text-slate-400">
               <tr>
                 <th className="py-3 px-4">Service & Provider</th>
-                <th className="py-3 px-4">Category</th>
+                <th className="py-3 px-4">Operational Category</th>
                 <th className="py-3 px-4">Monthly Cost</th>
                 <th className="py-3 px-4">Next Renewal</th>
                 <th className="py-3 px-4 text-right">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-[#1E2E4A]/60">
               {subscriptions.map((s) => (
-                <tr key={s.id} className="hover:bg-white/[0.02]">
+                <tr key={s.id} className="hover:bg-white/[0.03] transition-colors">
                   <td className="py-3 px-4 font-semibold text-white">{s.name}</td>
                   <td className="py-3 px-4 text-slate-400">{s.category}</td>
                   <td className="py-3 px-4 font-mono font-bold text-white">
@@ -95,7 +132,9 @@ export function SubscriptionsView({ subscriptions, onAddSubscription }: Subscrip
                   </td>
                   <td className="py-3 px-4 text-slate-300 font-mono">{s.renewalDate}</td>
                   <td className="py-3 px-4 text-right">
-                    <span className="text-emerald-400 font-medium">{s.status}</span>
+                    <span className="text-emerald-400 font-mono text-[11px] bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                      {s.status}
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -108,9 +147,9 @@ export function SubscriptionsView({ subscriptions, onAddSubscription }: Subscrip
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div onClick={() => setModalOpen(false)} className="fixed inset-0 bg-black/80 backdrop-blur-sm" />
-          <div className="relative w-full max-w-md rounded-xl border border-white/10 bg-[#0B101B] p-6 text-slate-200 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
-              <h3 className="text-lg font-bold text-white">Track Recurring Subscription</h3>
+          <div className="relative w-full max-w-md rounded-2xl border border-[#1E2E4A] bg-[#0A1324] p-6 text-slate-200 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-[#1E2E4A] mb-4">
+              <h3 className="text-base font-bold text-white">Track Technology Expense</h3>
               <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
@@ -124,29 +163,33 @@ export function SubscriptionsView({ subscriptions, onAddSubscription }: Subscrip
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Stripe Radar / SendGrid"
-                  className="w-full px-3 py-2 rounded bg-white/[0.04] border border-white/10 text-white focus:outline-none focus:border-[#38BDF8]"
+                  placeholder="e.g. Supabase Pro Enterprise"
+                  className="w-full px-3 py-2 rounded-lg bg-[#0E1B33] border border-[#1E2E4A] text-white focus:outline-none focus:border-[#38BDF8]"
                 />
               </div>
 
               <div>
                 <label className="block text-slate-300 font-medium mb-1">Category</label>
-                <input
-                  type="text"
+                <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 rounded bg-white/[0.04] border border-white/10 text-white focus:outline-none focus:border-[#38BDF8]"
-                />
+                  className="w-full px-3 py-2 rounded-lg bg-[#0E1B33] border border-[#1E2E4A] text-white focus:outline-none"
+                >
+                  <option value="Cloud Infrastructure">Cloud Infrastructure</option>
+                  <option value="Customer Messaging">Customer Messaging / WhatsApp API</option>
+                  <option value="AI Intelligence">AI & LLM Services</option>
+                  <option value="Security & Compliance">Security & Compliance</option>
+                </select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">Monthly Cost ($ USD)</label>
+                  <label className="block text-slate-300 font-medium mb-1">Monthly Cost ($)</label>
                   <input
                     type="number"
                     value={cost}
                     onChange={(e) => setCost(e.target.value)}
-                    className="w-full px-3 py-2 rounded bg-white/[0.04] border border-white/10 text-white focus:outline-none focus:border-[#38BDF8]"
+                    className="w-full px-3 py-2 rounded-lg bg-[#0E1B33] border border-[#1E2E4A] text-white focus:outline-none"
                   />
                 </div>
                 <div>
@@ -155,22 +198,22 @@ export function SubscriptionsView({ subscriptions, onAddSubscription }: Subscrip
                     type="date"
                     value={renewalDate}
                     onChange={(e) => setRenewalDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded bg-[#0F172A] border border-white/10 text-white focus:outline-none"
+                    className="w-full px-3 py-2 rounded-lg bg-[#0E1B33] border border-[#1E2E4A] text-white focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-white/10 flex justify-end gap-2">
+              <div className="pt-3 border-t border-[#1E2E4A] flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl bg-white/5 text-slate-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded bg-[#38BDF8] text-slate-950 font-bold hover:bg-[#7dd3fc]"
+                  className="px-5 py-2 rounded-xl bg-[#2489DA] text-white font-bold hover:bg-[#38BDF8] hover:text-slate-950 transition-colors"
                 >
                   Save Expense
                 </button>

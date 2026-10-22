@@ -31,7 +31,7 @@ import {
 } from '@/lib/workspace-data';
 import { useAuth } from '@/lib/auth-context';
 import { BrandLogo } from '@/components/brand-icon';
-import { ArrowRight, Lock, Sparkles, UserCheck, Shield } from 'lucide-react';
+import { ArrowRight, Lock, Sparkles, UserCheck, Shield, Bot, Zap } from 'lucide-react';
 import Link from 'next/link';
 
 export default function WorkspacePage() {
@@ -95,7 +95,7 @@ export default function WorkspacePage() {
             {
               id: `msg-${Date.now()}`,
               senderType: 'agent',
-              senderName: user ? user.fullName : 'Agent',
+              senderName: user ? user.fullName : 'Marcus Vance',
               content: `Hello ${targetCustomer.fullName}, thank you for your inquiry. How may we assist your team today?`,
               timestamp: 'Just now',
               isApproved: true,
@@ -189,7 +189,6 @@ export default function WorkspacePage() {
     setConversations((prev) =>
       prev.map((c) => {
         if (c.id === conversationId) {
-          // Remove previous unapproved draft if any, then add fresh draft
           const cleanMsgs = c.messages.filter((m) => !(m.isAiDraft && !m.isApproved));
           const newDraftMsg: ConversationMessage = {
             id: `msg-ai-${Date.now()}`,
@@ -251,25 +250,25 @@ export default function WorkspacePage() {
     const newCustomer: Customer = {
       id: newCustId,
       fullName: chosen.name,
-      company: chosen.company,
       email: chosen.email,
       phone: chosen.phone,
+      company: chosen.company,
       source: chosen.source,
       tier: 'VIP',
-      lifetimeValue: 0,
+      lifetimeValue: 35000,
       dealStage: chosen.stage,
-      dealValue: channel === 'whatsapp' ? 18500 : channel === 'instagram' ? 12000 : 34000,
-      assignedAgent: user ? user.fullName : 'Marcus Vance',
-      notes: chosen.inquiry,
-      createdAt: 'Today',
+      dealValue: 35000,
+      assignedAgent: 'Marcus Vance',
+      notes: `Inbound simulation via ${chosen.source} channel gateway.`,
+      createdAt: new Date().toISOString().slice(0, 10),
     };
 
-    const newConv: Conversation = {
+    const newConversation: Conversation = {
       id: newConvId,
       customerId: newCustId,
       customerName: chosen.name,
       customerEmail: chosen.email,
-      channel: channel,
+      channel,
       status: 'open',
       unreadCount: 1,
       lastMessage: chosen.inquiry,
@@ -282,25 +281,35 @@ export default function WorkspacePage() {
           content: chosen.inquiry,
           timestamp: 'Just now',
         },
+        {
+          id: `msg-ai-${timestamp}`,
+          senderType: 'ai_assistant',
+          senderName: 'DIAMONDS AI (Gemini 3.8 Flash)',
+          content: `Dear ${chosen.name},\n\nThank you for reaching out to DIAMONDS Luxury Concierge regarding your upcoming requirements. We have verified exclusive availability and would be delighted to host your party with private sommelier pairings and priority berth clearance.\n\nShall we stage the detailed formal prospectus for your review?`,
+          timestamp: 'Just now',
+          isAiDraft: true,
+          isApproved: false,
+        },
       ],
     };
 
     setCustomers((prev) => [newCustomer, ...prev]);
-    setConversations((prev) => [newConv, ...prev]);
+    setConversations((prev) => [newConversation, ...prev]);
     setSelectedConversationId(newConvId);
+    setCurrentTab('inbox');
   };
 
   const handleAddWebsite = (site: WebsiteAsset) => {
     setWebsites([site, ...websites]);
   };
 
-  const handleAddBooking = (b: TourBooking) => {
-    setBookings([b, ...bookings]);
+  const handleAddBooking = (booking: TourBooking) => {
+    setBookings([booking, ...bookings]);
   };
 
   const handleToggleWorkflow = (id: string) => {
     setWorkflows((prev) =>
-      prev.map((wf) => (wf.id === id ? { ...wf, isActive: !wf.isActive } : wf))
+      prev.map((w) => (w.id === id ? { ...w, isActive: !w.isActive } : w))
     );
   };
 
@@ -312,44 +321,46 @@ export default function WorkspacePage() {
     setSubscriptions([sub, ...subscriptions]);
   };
 
-  const handleInviteMember = (m: TeamMember) => {
-    setTeam([...team, m]);
+  const handleInviteMember = (member: TeamMember) => {
+    setTeam([...team, member]);
   };
 
-  // Auth form handler
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
-    if (!authEmail) return;
 
     if (authMode === 'signin') {
       const res = await signIn(authEmail, authPassword);
-      if (res.error) setAuthError(res.error);
+      if (res?.error) setAuthError(res.error);
     } else {
       const res = await signUp(authEmail, authPassword, authName, authCompany);
-      if (res.error) setAuthError(res.error);
+      if (res?.error) setAuthError(res.error);
     }
   };
 
-  // If user is not authenticated, show the Workspace Authentication Gateway
+  // Auth gate check
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#070A10] flex flex-col justify-between text-slate-200 p-4 sm:p-6">
-        <div className="max-w-7xl mx-auto w-full pt-4">
+      <div className="min-h-screen bg-[#070E1A] text-[#E2E8F0] flex flex-col justify-between p-4 sm:p-6">
+        <header className="max-w-7xl mx-auto w-full flex items-center justify-between py-4">
           <Link href="/">
-            <BrandLogo />
+            <BrandLogo className="h-7" />
           </Link>
-        </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              Supabase PostgreSQL RLS Active
+            </span>
+          </div>
+        </header>
 
-        <div className="max-w-md mx-auto w-full my-12">
-          <div className="rounded-2xl border border-white/10 bg-[#0B101B] p-6 sm:p-8 shadow-2xl space-y-6">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-sky-950/60 border border-sky-800/40 text-sky-300 text-xs font-semibold mb-3">
-                <Lock className="w-3.5 h-3.5" />
-                <span>Supabase Workspace Gateway</span>
+        <div className="flex-1 flex items-center justify-center py-10">
+          <div className="w-full max-w-md rounded-2xl border border-[#1E2E4A] bg-[#0A1324] p-6 sm:p-8 text-slate-200 shadow-2xl space-y-6">
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-2xl bg-[#2489DA]/15 border border-[#2489DA]/30 flex items-center justify-center text-[#38BDF8] mx-auto mb-3 shadow-[0_0_20px_rgba(36,137,218,0.3)]">
+                <Lock className="w-6 h-6" />
               </div>
               <h1 className="text-2xl font-extrabold text-white tracking-tight">
-                {authMode === 'signin' ? 'Sign in to DIAMONDS' : 'Create Workspace Account'}
+                {authMode === 'signin' ? 'Sign in to DIAMONDS' : 'Create Organization Workspace'}
               </h1>
               <p className="text-xs text-slate-400 mt-1">
                 Enter your credentials or launch an instant preview session.
@@ -357,33 +368,33 @@ export default function WorkspacePage() {
             </div>
 
             {authError && (
-              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs">
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
                 {authError}
               </div>
             )}
 
             {/* Quick 1-Click Launch */}
-            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
+            <div className="p-4 rounded-xl bg-[#0E1B33] border border-[#1E2E4A] space-y-2">
               <span className="text-[11px] uppercase tracking-wider font-bold text-white flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" />
                 Instant Preview Access
               </span>
               <p className="text-xs text-slate-400 leading-normal">
-                Test the live Phase 2 workspace immediately with pre-loaded demo records:
+                Test the live Genie ERP workspace immediately with pre-loaded demo records:
               </p>
               <div className="pt-2 flex flex-col sm:flex-row gap-2">
                 <button
                   type="button"
                   onClick={() => demoLogin('Owner')}
-                  className="flex-1 py-2 px-3 rounded-lg bg-[#38BDF8] text-slate-950 font-bold text-xs uppercase hover:bg-[#7dd3fc] transition-colors flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2 px-3 rounded-xl bg-[#2489DA] text-white font-bold text-xs uppercase hover:bg-[#38BDF8] hover:text-slate-950 transition-colors flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(36,137,218,0.3)]"
                 >
                   <UserCheck className="w-3.5 h-3.5" />
-                  <span>Launch as Marcus (Owner)</span>
+                  <span>Launch as Owner (Marcus)</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => demoLogin('Manager')}
-                  className="py-2 px-3 rounded-lg border border-white/15 text-slate-200 font-semibold text-xs hover:bg-white/5 transition-colors"
+                  className="py-2 px-3 rounded-xl border border-[#1E2E4A] bg-[#070E1A] text-slate-200 font-semibold text-xs hover:border-[#38BDF8]/40 hover:text-white transition-colors"
                 >
                   Elena (Manager)
                 </button>
@@ -391,9 +402,9 @@ export default function WorkspacePage() {
             </div>
 
             <div className="relative flex items-center justify-center text-xs text-slate-500 uppercase tracking-wider">
-              <div className="border-t border-white/10 w-full" />
-              <span className="bg-[#0B101B] px-3 font-mono text-[10px]">Or with email</span>
-              <div className="border-t border-white/10 w-full" />
+              <div className="border-t border-[#1E2E4A] w-full" />
+              <span className="bg-[#0A1324] px-3 font-mono text-[10px]">Or with email</span>
+              <div className="border-t border-[#1E2E4A] w-full" />
             </div>
 
             {/* Email form */}
@@ -408,7 +419,7 @@ export default function WorkspacePage() {
                       value={authName}
                       onChange={(e) => setAuthName(e.target.value)}
                       placeholder="Marcus Vance"
-                      className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-white focus:outline-none focus:border-[#38BDF8]"
+                      className="w-full px-3 py-2 rounded-lg bg-[#0E1B33] border border-[#1E2E4A] text-white focus:outline-none focus:border-[#38BDF8]"
                     />
                   </div>
                   <div>
@@ -418,8 +429,8 @@ export default function WorkspacePage() {
                       required
                       value={authCompany}
                       onChange={(e) => setAuthCompany(e.target.value)}
-                      placeholder="Apex Global Operations"
-                      className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-white focus:outline-none focus:border-[#38BDF8]"
+                      placeholder="DIAMONDS Holdings Monaco"
+                      className="w-full px-3 py-2 rounded-lg bg-[#0E1B33] border border-[#1E2E4A] text-white focus:outline-none focus:border-[#38BDF8]"
                     />
                   </div>
                 </>
@@ -432,8 +443,8 @@ export default function WorkspacePage() {
                   required
                   value={authEmail}
                   onChange={(e) => setAuthEmail(e.target.value)}
-                  placeholder="marcus@apexoperations.io"
-                  className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-white focus:outline-none focus:border-[#38BDF8]"
+                  placeholder="marcus@diamonds-luxury.com"
+                  className="w-full px-3 py-2 rounded-lg bg-[#0E1B33] border border-[#1E2E4A] text-white focus:outline-none focus:border-[#38BDF8]"
                 />
               </div>
 
@@ -444,13 +455,13 @@ export default function WorkspacePage() {
                   value={authPassword}
                   onChange={(e) => setAuthPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-white focus:outline-none focus:border-[#38BDF8]"
+                  className="w-full px-3 py-2 rounded-lg bg-[#0E1B33] border border-[#1E2E4A] text-white focus:outline-none focus:border-[#38BDF8]"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-lg bg-white text-slate-950 font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition-colors"
+                className="w-full py-2.5 rounded-xl bg-[#2489DA] text-white font-bold text-xs uppercase tracking-wider hover:bg-[#38BDF8] hover:text-slate-950 transition-colors shadow-lg"
               >
                 {authMode === 'signin' ? 'Sign In to Workspace' : 'Create Organization Workspace'}
               </button>
@@ -483,18 +494,21 @@ export default function WorkspacePage() {
         </div>
 
         <div className="max-w-7xl mx-auto w-full text-center text-[11px] text-slate-400 pb-4">
-          DIAMONDS Unified Operating System · Phase 2 Multi-Tenant Environment
+          DIAMONDS Unified Operating System • Genie ERP Architecture
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#070A10] text-[#E2E8F0] flex flex-col">
+    <div className="min-h-screen bg-[#070E1A] text-[#E2E8F0] flex flex-col font-sans">
       {/* Top Header */}
       <WorkspaceHeader
         mobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
         onOpenNewCustomer={() => setCurrentTab('crm')}
+        onNavigateTab={setCurrentTab}
+        onSimulateInbound={handleSimulateInbound}
+        unreadCount={unreadCount}
       />
 
       <div className="flex-1 flex">
@@ -517,6 +531,7 @@ export default function WorkspacePage() {
               bookings={bookings}
               onNavigateTab={setCurrentTab}
               onApproveDraft={handleApproveDraft}
+              onSimulateInbound={handleSimulateInbound}
             />
           )}
 
